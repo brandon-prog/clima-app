@@ -49,14 +49,13 @@ function App() {
     <div className="container">
       <div className="video-container">
       <video autoPlay loop muted className="background-video">
-        <source src="/public/Fondo.mp4" type="video/mp4" />
+        <source src="/Fondo.mp4" type="video/mp4" />
         Tu navegador no soporta el video.
       </video>
-
     </div>
       {weather && (
         <div className="card">
-  <h1 className="title">Aplicación del Clima</h1>
+  <h1 className="title">Clima</h1>
   <h2 className="location">
     {weather.name}, {weather.sys.country}
   </h2>
