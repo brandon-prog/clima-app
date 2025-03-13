@@ -10,6 +10,9 @@ function App() {
   const [coords, setCoords] = useState(null);
   const [weather, setWeather] = useState(null);
   const [isCelsius, setIsCelsius] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [dots, setDots] = useState("");
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -18,10 +21,15 @@ function App() {
           const { latitude, longitude } = position.coords;
           setCoords({ lat: latitude, lon: longitude });
         },
-        () => console.log("Permission denied")
+        () =>{ console.log("Permission denied")
+        setError(true);
+        setLoading(false);
+        }
       );
     } else {
       console.log("Geolocation is not supported by this browser.");
+      setError(true);
+      setLoading(false);
     }
   }, []);
 
@@ -29,10 +37,24 @@ function App() {
     if (coords) {
       axios
         .get(`${BASE_URL}lat=${coords.lat}&lon=${coords.lon}&appid=${API_KEY}&units=metric&lang=es`)
-        .then((res) => setWeather(res.data))
-        .catch((err) => console.log("Error fetching weather:", err));
+        .then((res) => {
+          setWeather(res.data);
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.log("  Error fetching weather:", err);
+          setError(true);
+          setLoading(false);
+        });
     }
   }, [coords]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDots((prev) => (prev.length < 3 ? prev + "." : ""));
+    }, 500);
+    return () => clearInterval(interval);
+  }, []);
 
   const convertTemperature = () => {
     setIsCelsius(!isCelsius);
@@ -53,9 +75,12 @@ function App() {
         Tu navegador no soporta el video.
       </video>
     </div>
+    {loading && <h2 className="loading-text">Cargando{dots}</h2>}
+    {error && <h2 className="error-text">No se pudo obtener el clima ❌</h2>}
+
       {weather && (
         <div className="card">
-  <h1 className="title">Clima</h1>
+  <h1 className="title">Aplicación del Clima</h1>
   <h2 className="location">
     {weather.name}, {weather.sys.country}
   </h2>
